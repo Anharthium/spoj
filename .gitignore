@@ -1,0 +1,5 @@
+#ignore all test files
+*.test
+
+#ignore all executables
+*.out
