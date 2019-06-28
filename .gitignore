@@ -3,3 +3,6 @@
 
 #ignore all executables
 *.out
+
+#ignore all swap files
+*.swp
