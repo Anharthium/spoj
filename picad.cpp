@@ -2,19 +2,32 @@
 #include <cstring>
 #include <assert.h>
 
-const int max_cache {100000000};
+struct time_per
+{
+    short start;    // number of start at this time
+    short end;      // number of end at this time
+};
 
-short time_period[2*max_cache + 1];
+const int max_cache {100000000};
+//const int max_cache {1000000000};
+
+struct time_per time_period[max_cache + 1];
 
 int main()
 {
-    short t = 10; // test cases
+    char t = 10; // test cases
 
-    for (int i=0; i<t; ++i)
+    for (char i=0; i<t; ++i)
     {
         int start = 0, end = 0; // starting and ending time of crime
         std::scanf("%d %d", &start, &end);
-        
+#if 0
+        assert(start <= end);
+        assert(start >= 0 && start <= max_cache);
+        assert(end >= 0 && end <= max_cache);
+#endif  
+        if (start > max_cache) start = max_cache;
+        if (end > max_cache) end = max_cache;
         int max = -1, min {max_cache + 1};
         
         int num_wit = 0;    // number of witnesses
@@ -26,7 +39,7 @@ int main()
             
             if (m < start || l > end)  // witness not present during crime
                 continue;
-
+            
             if (l < start && m >= start) 
             {
                 l = start;
@@ -36,40 +49,54 @@ int main()
             {
                 m = end;
             }
+            
+            //printf("l = %d | m = %d\t", l, m);
 
-            printf("l = %d | m = %d\t", l, m);
-
-            ++time_period[l*2]; // +ve to denote start time of witness
-            --time_period[m*2]; // -ve to denote end time of witness
+            ++time_period[l].start;   // denote number of start time of witness
+            ++time_period[m].end;     // denote number of end time of witness
         }
         
         int stack = 0;
-        for (int j = start*2; j <= end*2; ++j)
+#ifdef DEBUG
+        printf("[ ");
+#endif
+        for (int j = start; j <= end; ++j)
         {
-            printf("%d ", time_period[j]);
+#ifdef DEBUG
+            printf("%d,%d ", time_period[j].start, time_period[j].end);
+#endif
 
-            if (time_period[j] > 0)   // start
+            if (time_period[j].start > 0)   // start
             {
-                stack += time_period[j]; // push for start time of witness
+                stack += time_period[j].start; // push for start time of witnesses
 
                 if (stack > max) 
                     max = stack;
+
+                time_period[j].start = 0;
             }
 
-            if (time_period[j] < 0)
+            if (time_period[j].end > 0)
             {
-                stack += time_period[j]; // pop for end time of witness
+                stack -= time_period[j].end; // pop for end time of witness
 
-                if (stack < min && j != end*2) // don't consider ending time pop of crime scene
+                if (stack < min && j != end) // don't consider ending time pop of crime scene
                     min = stack;
+                
+                time_period[j].end = 0;
             }
         }
-        printf("\n");
+#ifdef DEBUG
+        printf("]\n");
+#endif
         
-        assert(stack == 0);
+        //assert(stack == 0);
+
+        if (max == -1) max = 0;
+        if (min == max_cache + 1) min = 0;
         
         printf("%d %d\n", min, max);
-        memset(time_period, 0, sizeof(time_period));
+        //memset(time_period, 0, sizeof(time_period));
     }
     
 }
