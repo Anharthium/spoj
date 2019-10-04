@@ -1,4 +1,3 @@
-
 def main():
     t = eval(input()) # test cases
     for i in range(t):
@@ -27,7 +26,7 @@ def big_num_as(operator, num):
     
     nlen = [0, 0, 0]
     nlen[0] = len(num[0])
-    nlen[1] = len(num[1])
+    nlen[1] = len(num[1]) + 1 # one plus for operator '+' or '-'
 
     # convert to int
     num[0] = int(num[0])
@@ -45,8 +44,8 @@ def big_num_as(operator, num):
     num[0] = str(num[0])
     num[1] = str(num[1])
 
+
     # calc. leading spaces and form final string
-    spaces = 0 # num of spaces
     op_app = False # have we appended operator
     max_len = max(nlen)
     for i in range(3):
@@ -55,20 +54,21 @@ def big_num_as(operator, num):
             num[i] = operator + num[1]
             op_app = True
             
-        if (i == 1):
-            num[i] = (' '*(spaces-1)) + num[i] # one space less since it already has operator appended
-        else:
-            num[i] = (' '*spaces) + num[i]
-
+        num[i] = (' '*spaces) + num[i]
+    
+    # number of dashes to print
+    dashes = max(len(num[1]), len(num[2]))
+    
+    # printing starts
     for i in range(4):
         if (i <= 1):
             print(num[i])
         elif (i == 2):
-            print("-"*max_len) # print req. num of '-'
+            print("-" * dashes) # print req. num of '-'
         else:
             print(num[i-1])
 
-    print()
+    print() # last line
 
 
 def big_num_mul(num):
@@ -76,66 +76,83 @@ def big_num_mul(num):
     big number multiplication
     """
     
-    nlen = [0, 0, 0] # input numbers and its result
+    nlen = [0, 0, 0] # length of input numbers and its result
     nlen[0] = len(num[0])
-    nlen[1] = len(num[1])
-    num_temp = [0]*nlen[1] # for intermediate numbers during multiplication
+    nlen[1] = len(num[1]) + 1 # plus 1 for operator '*'
+    num_temp = [0]*(nlen[1] - 1) # for intermediate numbers during multiplication
+    
+    skip = 0 # should I skip temp. numbers printing? 0 for No, 1 for yes
+    if (nlen[1] == 2): # second number has only one digit
+        skip = 1
     
     # convert to int
     num[0] = int(num[0])
     num[2] = 0 # to contain the final result
 
     # calculate temp_numbers and final result
-    for i in range(1, nlen[1] + 1):
+    for i in range(1, nlen[1]):
         num_temp[i-1] = num[0] * int(num[1][-i])
-        num[2] += num_temp[i-1] # final result
-    
-    num[1] = int(num[1])
+        # exponentiation by 10 represents 
+        # that many zeroes at the end
+        add_mul = num_temp[i-1] * (10**(i-1))
+        num[2] += add_mul # final result
 
-    dashes = max(num) # number of dashes to print
-     
     # convert back to str
     num[0] = str(num[0])
     num[1] = str(num[1])
     num[2] = str(num[2]) 
     nlen[2] = len(num[2])
+    
+    num_dashes1 = max(nlen[1], len(str(num_temp[0]))) # number of first dashes to print is the 
+                                                      # maximum of top number and botom number
+    dashes1 = '-' * num_dashes1
 
     # calc. trailing spaces for intermediate numbers
     num_temp_len = len(num_temp)
     for i in range(num_temp_len):
-        num_temp[i] = str(num_temp[i]) + (" " * i) # to str
+        num_temp[i] = str(num_temp[i]) + (" " * i) # space to add at tail = i
     
     len_temp = [len(i) for i in num_temp] # list of length of temp numbers
+    
+    # --------------- prepare final strings with apt number of spaces inserted ---------------
 
-    # calc. leading spaces for every num
-    max_len = max(dashes, max(len_temp))
+    # calc. and prepare leading spaces for every num
+    max_len = max(max(nlen), max(len_temp), num_dashes1)
     for i in range(len(num)):
-        spaces = max_len - len(num[i])
+        spaces = max_len - nlen[i]
         if (i == 1):
             num[i] = '*' + num[i] # attach operator
-            num[i] = (" " * (spaces-1)) + num[i] # attach leading spaces
-        else:
-            num[i] = (" " * spaces) + num[i] # attach leading spaces
+        num[i] = (" " * spaces) + num[i] # attach leading spaces
+
+    # calculate and prepare leading spaces for dashes1
+    spaces = max_len - num_dashes1
+    dashes1 = (" " * spaces) + dashes1
     
     # calc. leading spaces for intermediate nums
     for i in range(num_temp_len):
         spaces = max_len - len(num_temp[i])
         num_temp[i] = (" " * spaces) + num_temp[i]
+
+    # calc. dashes2
+    num_dashes2 = max(len(num_temp[-1]), len(num[-1]))
+    dashes2 = '-' * num_dashes2
     
     # ------ printing starts ---------
     # print num
     for i in range(len(num)):
         if (i <= 1):
             print(num[i])
-        elif (i == 2):
-            print("-"*dashes) # print req. num of '-'
-    
-    # print temp numbers
-    for i in range(num_temp_len):
-        print(num_temp[i])
+        elif (i == 2): # print dashes1
+            print(dashes1)
 
-    # print dashes
-    print("-" * max_len) # print req. num of '-'
+    # print temp numbers; skip if only one temp_num present
+    if (skip == 0):
+        for i in range(num_temp_len):
+            print(num_temp[i])
+
+    # print dashes2; skip if only one temp_num present
+    if (skip == 0):
+        print(dashes2)
 
     # print final result
     print(num[2])
