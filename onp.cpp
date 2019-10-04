@@ -13,19 +13,40 @@ using std::cin;
 using std::endl;
 using std::string;
 
-stack< pair<char, short> > op_st; // operator stack
 
-short op_precedence(char op) {
-    // return operator precedence
+short op_out_precedence(char op) {
+    // return operator precedence (when outside of stack)
+    // in and out precedence is to take care of associativity
+    // Here we don't require the associativity of any other operator except '('
     // input: operator; output: its precedence value
 
     switch (op) {
-        case '+': return 0;
-        case '-': return 1;
-        case '*': return 2;
-        case '/': return 3;
-        case '^': return 4;
-        case '(': return 6; 
+        case '+': return 1;
+        case '-': return 2;
+        case '*': return 3;
+        case '/': return 4;
+        case '^': return 5;
+        case '(': return 6;
+        default : abort(); // not supposed to happen
+                           // operator can't be other than the mentioned cases
+    }
+}
+
+short op_in_precedence(char op) {
+    // return operator precedence (when inside of stack)
+    // in and out precedence is to take care of associativity
+    // Here we don't require the associativity of any other operator except '('
+    // input: operator; output: its precedence value
+
+    switch (op) {
+        case '+': return 1;
+        case '-': return 2;
+        case '*': return 3;
+        case '/': return 4;
+        case '^': return 5;
+        case '(': return 0;
+        default : abort(); // not supposed to happen
+                           // operator can't be other than the mentioned cases
     }
 }
 
@@ -43,24 +64,26 @@ void in_to_post(string & expr) {
     // infix to postfix converter
     // input: infix expression
     
+    stack< pair<char, short> > op_st; // operator stack
+    int len = expr.length(); 
     
-    for (int i = 0; i < expr.length(); ++i) {
+    for (int i = 0; i < len; ++i) {
         if (is_operator(expr[i])) { // operator
             // pop op_stack until the 
-            // top of the stack has less precedence 
+            // top of the stack has less or equal precedence 
             // than curr operator or stack is empty
             while(1) {
                 if (op_st.empty()) { // stack is empty; straight away push
-                    op_st.push(std::make_pair(expr[i], op_precedence(expr[i])));
+                    op_st.push(std::make_pair(expr[i], op_in_precedence(expr[i])));
                     break;
                 }
                 pair <char, short> & top_op = op_st.top();
-                if (op_precedence(top_op.second) >= op_precedence(expr[i])) {
+                if (top_op.second > op_out_precedence(expr[i])) {
                     cout << top_op.first;
                     op_st.pop();
                 }
                 else {
-                    op_st.push(std::make_pair(expr[i], op_precedence(expr[i])));
+                    op_st.push(std::make_pair(expr[i], op_in_precedence(expr[i])));
                     break;
                 }
             }
@@ -71,7 +94,7 @@ void in_to_post(string & expr) {
         else if (expr[i] == ')') {  // right paranthesis
             while (1) {
                 if (op_st.empty()) { // invalid expression; ')' reached before matching '('
-                    //cout << "No matching '(' found\n";
+                    cout << "No matching '(' found\n";
                     abort();
                 }
                 pair <char, short> & top_op = op_st.top();
