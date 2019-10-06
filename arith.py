@@ -39,6 +39,10 @@ def big_num_as(operator, num):
     
     num[2] = str(result) # to string
     nlen[2] = len(num[2])
+    
+    # number of dashes to print
+    num_dashes = max(nlen[1], nlen[2])
+    dashes = '-' * num_dashes
 
     # convert back to str
     num[0] = str(num[0])
@@ -55,16 +59,20 @@ def big_num_as(operator, num):
             op_app = True
             
         num[i] = (' '*spaces) + num[i]
+
+    # calc. leading spaces for dashes
+    spaces = max_len - num_dashes
+    dashes = ' ' * spaces + dashes
     
     # number of dashes to print
-    dashes = max(len(num[1]), len(num[2]))
+    # dashes = max(len(num[1]), len(num[2]))
     
     # printing starts
     for i in range(4):
         if (i <= 1):
             print(num[i])
         elif (i == 2):
-            print("-" * dashes) # print req. num of '-'
+            print(dashes) # print req. num of '-'
         else:
             print(num[i-1])
 
@@ -156,7 +164,8 @@ def big_num_mul(num):
 
     # print final result
     print(num[2])
-    print()
+    
+    print() # for last line
 
 
 main() # call main
