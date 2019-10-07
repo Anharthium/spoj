@@ -21,7 +21,7 @@ def main():
 
 def big_num_as(operator, num):
     """
-    big number addition and subtraction
+    big number addition and subtraction function
     """
     
     nlen = [0, 0, 0]
@@ -81,7 +81,7 @@ def big_num_as(operator, num):
 
 def big_num_mul(num):
     """
-    big number multiplication
+    big number multiplication function
     """
     
     nlen = [0, 0, 0] # length of input numbers and its result
