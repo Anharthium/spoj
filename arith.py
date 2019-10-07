@@ -114,36 +114,42 @@ def big_num_mul(num):
     num_dashes1 = max(nlen[1], len(str(num_temp[0]))) # number of first dashes to print is the 
                                                       # maximum of top number and botom number
     dashes1 = '-' * num_dashes1
+    
+    # calc. dashes2
+    num_dashes2 = max(len(str(num_temp[-1])), len(num[-1]))
+    dashes2 = '-' * num_dashes2
 
     # calc. trailing spaces for intermediate numbers
     num_temp_len = len(num_temp)
     for i in range(num_temp_len):
-        num_temp[i] = str(num_temp[i]) + (" " * i) # space to add at tail = i
+        num_temp[i] = str(num_temp[i]) + (' ' * i) # space to add at tail = i
     
     len_temp = [len(i) for i in num_temp] # list of length of temp numbers
     
     # --------------- prepare final strings with apt number of spaces inserted ---------------
 
     # calc. and prepare leading spaces for every num
-    max_len = max(max(nlen), max(len_temp), num_dashes1)
+    max_len = max(max(nlen), max(len_temp))
+    
     for i in range(len(num)):
         spaces = max_len - nlen[i]
         if (i == 1):
             num[i] = '*' + num[i] # attach operator
-        num[i] = (" " * spaces) + num[i] # attach leading spaces
+        num[i] = (' ' * spaces) + num[i] # attach leading spaces
 
     # calculate and prepare leading spaces for dashes1
     spaces = max_len - num_dashes1
-    dashes1 = (" " * spaces) + dashes1
+    dashes1 = (' ' * spaces) + dashes1
+    
+    # calculate and prepare leading spaces for dashes2
+    spaces = max_len - num_dashes2
+    dashes2 = (' ' * spaces) + dashes2
     
     # calc. leading spaces for intermediate nums
     for i in range(num_temp_len):
         spaces = max_len - len(num_temp[i])
-        num_temp[i] = (" " * spaces) + num_temp[i]
+        num_temp[i] = (' ' * spaces) + num_temp[i]
 
-    # calc. dashes2
-    num_dashes2 = max(len(num_temp[-1]), len(num[-1]))
-    dashes2 = '-' * num_dashes2
     
     # ------ printing starts ---------
     # print num
