@@ -45,6 +45,7 @@ public:
     void insert_edge(int src, int dst, int weight);
     void djk_short_path(int source, int dest); 
     void prims_mst(int source); 
+    void kruskals_mst(); 
     void show_graph();
 
 };
@@ -114,6 +115,28 @@ void Graph::prims_mst(int source) {
     cout << min_spt_cost << endl;
     
 }
+
+void Graph::kruskals_mst() {
+    // kruskals min spt
+    
+    typedef struct {
+        int w, x, y; // x-y with weight w
+    } edge;
+
+    vector<edge> edges;
+    
+    for (int i = 0; i < nvertex; ++i) {
+        edge e;
+        e.x = i;
+        for (auto j = adj_list[i].begin(); j != adj_list[i].end(); ++j) {
+            e.y = (*j).y;
+            e.w = (*j).w;
+            edges.push_back(e);
+        }
+
+    }
+}
+
 
 void Graph::show_graph() {
     // print graph utility function
@@ -211,6 +234,75 @@ void Graph::djk_short_path(int source, int dest) {
     // cout << short_dist[dest] << endl;
 }
 
+// set union data structure
+class Set_union {
+private:
+    int set_size;                   // number of elements
+    vector <int> parent = vector <int>(set_size);  // parent index of element i
+    vector <int> size = vector <int>(set_size);    // size of each subtree rooted at i
+
+public:
+    Set_union(int sz = 1): set_size {sz} {
+        for (int i = 0; i < set_size; ++i) {
+            parent[i] = i; // its parent is the same element
+            size[i] = 1; 
+        }
+    }
+    
+    int find(int elem);
+    void union_sets(int s1, int s2);
+    bool same_component(int s1, int s2);
+};
+
+int Set_union::find(int elem) {
+    // find elem in the set, 
+    // and return its root element
+    
+    vector <int> path; // to track the path to root (except root)
+
+    // stop only when parent of elem is elem itself 
+    while (parent[elem] != elem) {
+        elem = parent[elem];
+        path.push_back(elem);
+    }
+
+    // link all the nodes found in the path [path compression] 
+    // directly to root to decrease size even further
+    for (int i = 0; i < path.size(); ++i) {
+        parent[path[i]] = elem;
+        size[path[i]] = 2;
+    }
+
+    return elem;
+}
+
+void Set_union::union_sets(int s1, int s2) {
+    // union/merge sets identified by s1, s2
+
+    // find respective roots
+    int r1 = find(s1);
+    int r2 = find(s2);
+
+    if (r1 == r2) return; // already merged
+
+    if (size[r1] > size[r2]) { // attach r2 with r1
+        parent[r2] = r1;
+    } 
+    else if (size[r2] > size[r1]) {  // attach r1 with r2
+        parent[r1] = r2;
+    }
+    else { // both sizes equal
+        // link r1 with r2
+        parent[r1] = r2;
+        size[r2] += 1;
+    }
+}
+
+inline bool Set_union::same_component(int s1, int s2) {
+    // are s1 and s2 in the same component or not?
+    return (find(s1) == find(s2));
+}
+
 int main() {
    
 #if 0 
@@ -233,7 +325,6 @@ int main() {
     
     graph.show_graph();
     graph.prims_mst(0);
-#endif
     
     Graph graph(8, false);
 
@@ -250,5 +341,7 @@ int main() {
     
     graph.show_graph();
     graph.prims_mst(0);
-
+#endif
+    
+    Set_union set(6);
 }
