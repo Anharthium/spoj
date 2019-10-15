@@ -1,4 +1,4 @@
-// prims algorithm for mst
+// graph algorithms implementation for mst
 
 #include <iostream>
 #include <string>
@@ -59,7 +59,7 @@ void Graph::prims_mst(int source) {
     // first is the cost, 
     // second is the index of the vertex
     set <pair <int, int>> distance;          // cost to include the vertex in the tree.
-    distance.insert(make_pair(0, source));   // insert source vertex into the set.
+    distance.insert(make_pair(0, source));   // insert cost (0) & source vertex into the set.
 
     // store result
     vector <int> min_spt;
@@ -79,7 +79,7 @@ void Graph::prims_mst(int source) {
         min_spt_cost += (*curr).first;
         
         // remove curr_vertex from set
-        if (curr != distance.end()) distance.erase(curr);
+        distance.erase(curr);
         
         // iterate over neighbours of curr_vertex
         for (auto i = adj_list[curr_vertex].begin(); 
@@ -94,7 +94,14 @@ void Graph::prims_mst(int source) {
         
         // get the least distance distance vertex 
         // which hasn't been included in the tree
-        curr = distance.begin();
+        while (1) {
+            if (distance.size() == 0) break;
+            curr = distance.begin();
+            if (in_tree[(*curr).second] == true)
+                distance.erase(curr);
+            else
+                break;
+        }
     }
 
     // print out min_spt
@@ -111,11 +118,12 @@ void Graph::prims_mst(int source) {
 void Graph::show_graph() {
     // print graph utility function
     
-    for (int i = 1; i < adj_list.size(); ++i) {
-        cout << i << "(" << adj_list[i].size() << ")";
+    cout << "vertex -- , adjacent vertex1 (weight1), adjacent vertex2 (weight2), ..." << endl;
+    for (int i = 0; i < adj_list.size(); ++i) {
+        cout << i << " -- ";
         for (auto iter = adj_list[i].begin(); 
                 iter != adj_list[i].end(); ++iter) {
-            cout << " " << (*iter).y;
+            cout << ", " << (*iter).y << " (" << (*iter).weight << ")";
         }
         cout << endl;
     }
@@ -204,8 +212,9 @@ void Graph::djk_short_path(int source, int dest) {
 }
 
 int main() {
-    
-    Graph graph(9, false); // 9 edges, undirected
+   
+#if 0 
+    Graph graph(9, false); // 9 vertices, undirected
     
     graph.insert_edge(0, 1, 4);
     graph.insert_edge(0, 7, 8);
@@ -217,12 +226,29 @@ int main() {
     graph.insert_edge(2, 8, 2);
     graph.insert_edge(2, 5, 4);
     graph.insert_edge(2, 3, 7);
-    graph.insert_edge(2, 5, 4);
     graph.insert_edge(3, 5, 14);
     graph.insert_edge(3, 4, 9);
     graph.insert_edge(5, 4, 10);
-
+    graph.insert_edge(6, 5, 2);
+    
+    graph.show_graph();
     graph.prims_mst(0);
+#endif
+    
+    Graph graph(8, false);
 
+    graph.insert_edge(0, 3, 4);
+    graph.insert_edge(1, 3, 7);
+    graph.insert_edge(1, 5, 8);
+    graph.insert_edge(5, 2, 7);
+    graph.insert_edge(0, 2, 9);
+    graph.insert_edge(0, 4, 7);
+    graph.insert_edge(2, 6, 4);
+    graph.insert_edge(6, 7, 4);
+    graph.insert_edge(4, 6, 3);
+    graph.insert_edge(2, 4, 9);
+    
+    graph.show_graph();
+    graph.prims_mst(0);
 
 }
