@@ -57,5 +57,5 @@ void solve_nqueens(int n) {
 }
 
 int main() {
-    solve_nqueens(16);
+    solve_nqueens(4);
 }
